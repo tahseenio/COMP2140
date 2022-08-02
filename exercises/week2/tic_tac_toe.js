@@ -6,20 +6,17 @@ const PLAYER_TWO = 'O';
 EMPTY = ' ';
 
 let isPlayerOnesTurn = true;
-let board = new Array(9).fill(' ');
+let board = new Array(9).fill(EMPTY);
 let winner = null;
 
-const getCurrentPlayer = () => {
-  return isPlayerOnesTurn ? PLAYER_ONE : PLAYER_TWO;
-};
-
 // Messages
-const MOVE_PROMPT = `Player ${getCurrentPlayer()}, please enter the index of your next move: `;
+const MOVE_PROMPT = (player) =>
+  `Player ${player}, please enter the index of your next move: `;
 const INVALID_INPUT = 'Wrong input. Please try again';
 const OUT_OF_BOUNDS = 'Position out of bounds. Please try again.';
 const POSITION_FILLED = 'Position already filled. Please try again.';
 const DRAW_MESSAGE = 'The game ended in a draw.';
-const WIN_MESSAGE = `\n Player ${getCurrentPlayer()} has won the game!!`;
+const WIN_MESSAGE = (player) => `\n Player ${player} has won the game!!`;
 const REPLAY_PROMPT = 'Do you wish to play again? [Y/N] ';
 
 WINNING_TRIOS = [
@@ -33,11 +30,8 @@ WINNING_TRIOS = [
   [2, 4, 6],
 ];
 
-const print_game_board = (board, padding) => {
-  const divider = '-';
-  const horizontal_divider = divider.repeat(
-    BOARD_LENGTH * (2 * padding + 1) + 2
-  );
+const print_game_board = (board, padding = 1) => {
+  const horizontal_divider = '-'.repeat(BOARD_LENGTH * (2 * padding + 1) + 2);
 
   for (let i = 0; i < BOARD_LENGTH; i++) {
     if (i !== 0) console.log(horizontal_divider);
@@ -54,14 +48,30 @@ const print_game_board = (board, padding) => {
   }
 };
 
-const resetGame = () => {
-  isPlayerOnesTurn = true;
-  board = new Array(9).fill(' ');
-  winner = null;
-};
+class Game {
+  constructor() {
+    this.reset();
+  }
+
+  reset = () => {
+    this.isPlayerOnesTurn = true;
+    this.board = new Array(9).fill(EMPTY);
+    this.winner = null;
+  };
+
+  get_next_move = () => {
+    while (true) {
+      let move = prompt(MOVE_PROMPT(this.getCurrentPlayer));
+    }
+  };
+
+  getCurrentPlayer = () => {
+    return isPlayerOnesTurn ? PLAYER_ONE : PLAYER_TWO;
+  };
+}
 
 const playGame = () => {
-  print_game_board(board, 1);
+  print_game_board(board);
 };
 
 const main = () => {
