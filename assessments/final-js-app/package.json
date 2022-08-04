@@ -1,0 +1,16 @@
+{
+  "name": "final-js-app",
+  "version": "1.0.0",
+  "description": "TransLink data parser that provides a summary of buses for the “UQ Lakes station” bus stop",
+  "main": "translink-parser.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv": "^6.2.0",
+    "prompt": "^1.3.0"
+  }
+}
