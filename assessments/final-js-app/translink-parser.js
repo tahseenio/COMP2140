@@ -3,34 +3,70 @@
 // https://www.data.qld.gov.au/dataset/general-transit-feed-specification-gtfs-seq/resource/be7f19e5-3ee8-4396-b9eb-46f6b4ce8039
 // TODO Understand what the files I have downloaded mean.
 
+const fetch = require('node-fetch');
+const fs = require('fs');
+
 // URL
 // Description
 
-// TODO: learn how to get proxy server working
-
 // http://127.0.0.1:5343/gtfs/seq/trip_updates.json
 // After running the server application, this will load a JSON version of SEQ Trip Updates (originally in Protobuf format).
+const fetchTripUpdates = async () => {
+  const promise = await fetch(
+    'http://127.0.0.1:5343/gtfs/seq/trip_updates.json'
+  );
+  const data = await promise.json();
+  let savedData = JSON.stringify(data);
+  fs.writeFileSync('./cached-data/trip_updates.json', savedData);
+};
+fetchTripUpdates();
 
 // http://127.0.0.1:5343/gtfs/seq/vehicle_positions.json
 // After running the server application, this will load a JSON version of SEQ Vehicle Positions (originally in Protobuf format).
+const fetchVehiclePositions = async () => {
+  const promise = await fetch(
+    'http://127.0.0.1:5343/gtfs/seq/vehicle_positions.json'
+  );
+  const data = await promise.json();
+  let savedData = JSON.stringify(data);
+  fs.writeFileSync('./cached-data/vehicle_positions.json', savedData);
+};
+fetchVehiclePositions();
 
 // http://127.0.0.1:5343/gtfs/seq/alerts.json
+const fetchAlerts = async () => {
+  const promise = await fetch('http://127.0.0.1:5343/gtfs/seq/alerts.json');
+  const data = await promise.json();
+  let savedData = JSON.stringify(data);
+  fs.writeFileSync('./cached-data/alerts.json', savedData);
+};
+fetchAlerts();
+
+const readData = () => {
+  fs.readFile('./cached-data/trip_updates.json', (err, data) => {
+    if (err) throw err;
+    let tripUpdates = JSON.parse(data);
+    console.log(tripUpdates);
+  });
+};
+// readData();
+
 // After running the server application, this will load a JSON version of SEQ Alerts (originally in Protobuf format).
-const prompt = require('prompt');
-const csvParse = require('csv-parse');
+// const prompt = require('prompt');
+// const csvParse = require('csv-parse');
 
-prompt.start();
+// prompt.start();
 
-console.log('Welcome to the UQ Lakes station bus tracker!');
+// console.log('Welcome to the UQ Lakes station bus tracker!');
 
-prompt.get(['username', 'email'], (err, result) => {
-  //
-  // Log the results.
-  //
-  console.log('Command-line input received:');
-  console.log('  username: ' + result.username);
-  console.log('  email: ' + result.email);
-});
+// prompt.get(['username', 'email'], (err, result) => {
+//   //
+//   // Log the results.
+//   //
+//   console.log('Command-line input received:');
+//   console.log('  username: ' + result.username);
+//   console.log('  email: ' + result.email);
+// });
 
 /*
 // Year, month & day in ISO 8601 format (YYYY-MM-DD)
