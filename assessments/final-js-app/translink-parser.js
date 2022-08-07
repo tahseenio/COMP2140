@@ -3,45 +3,6 @@
 // https://www.data.qld.gov.au/dataset/general-transit-feed-specification-gtfs-seq/resource/be7f19e5-3ee8-4396-b9eb-46f6b4ce8039
 // TODO Understand what the files I have downloaded mean.
 
-const fetch = require('node-fetch');
-const fs = require('fs');
-
-// URL
-// Description
-
-// http://127.0.0.1:5343/gtfs/seq/trip_updates.json
-// After running the server application, this will load a JSON version of SEQ Trip Updates (originally in Protobuf format).
-const fetchTripUpdates = async () => {
-  const promise = await fetch(
-    'http://127.0.0.1:5343/gtfs/seq/trip_updates.json'
-  );
-  const data = await promise.json();
-  let savedData = JSON.stringify(data);
-  fs.writeFileSync('./cached-data/trip_updates.json', savedData);
-};
-fetchTripUpdates();
-
-// http://127.0.0.1:5343/gtfs/seq/vehicle_positions.json
-// After running the server application, this will load a JSON version of SEQ Vehicle Positions (originally in Protobuf format).
-const fetchVehiclePositions = async () => {
-  const promise = await fetch(
-    'http://127.0.0.1:5343/gtfs/seq/vehicle_positions.json'
-  );
-  const data = await promise.json();
-  let savedData = JSON.stringify(data);
-  fs.writeFileSync('./cached-data/vehicle_positions.json', savedData);
-};
-fetchVehiclePositions();
-
-// http://127.0.0.1:5343/gtfs/seq/alerts.json
-const fetchAlerts = async () => {
-  const promise = await fetch('http://127.0.0.1:5343/gtfs/seq/alerts.json');
-  const data = await promise.json();
-  let savedData = JSON.stringify(data);
-  fs.writeFileSync('./cached-data/alerts.json', savedData);
-};
-fetchAlerts();
-
 const readData = () => {
   fs.readFile('./cached-data/trip_updates.json', (err, data) => {
     if (err) throw err;
