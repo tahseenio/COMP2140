@@ -39,12 +39,9 @@ const fetchAlerts = async () => {
 
 const startProxy = () => {
   // Proxy start + first initial cached data loaded
-  console.log('started proxy server');
-  exec('proxy.exe', (err, stdout, stderr) => {
-    if (err) throw err;
-    console.log(stdout);
-  });
-  setTimeout(() => {
+  try {
+    console.log('Started proxy server');
+    exec('proxy.exe');
     fetchTripUpdates();
     fetchVehiclePositions();
     fetchAlerts();
@@ -53,7 +50,9 @@ const startProxy = () => {
       new Date().toLocaleDateString(),
       new Date().toLocaleTimeString()
     );
-  }, 300);
+  } catch (err) {
+    console.log(err);
+  }
 };
 startProxy();
 

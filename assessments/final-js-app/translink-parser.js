@@ -13,33 +13,45 @@ const readData = () => {
 // readData();
 
 // After running the server application, this will load a JSON version of SEQ Alerts (originally in Protobuf format).
-// const prompt = require('prompt');
-// const csvParse = require('csv-parse');
+const prompt = require('prompt');
+const csvParse = require('csv-parse');
 
-// prompt.start();
+prompt.start();
 
-// console.log('Welcome to the UQ Lakes station bus tracker!');
+console.log('Welcome to the UQ Lakes station bus tracker!');
 
-// prompt.get(['username', 'email'], (err, result) => {
-//   //
-//   // Log the results.
-//   //
-//   console.log('Command-line input received:');
-//   console.log('  username: ' + result.username);
-//   console.log('  email: ' + result.email);
-// });
+const schema = {
+  properties: {
+    date: {
+      description: 'What date will you depart UQ Lakes station by bus?',
+      pattern: /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/,
+      message: 'Please enter in ISO 8601 format (YYYY-MM-DD)',
+      required: true,
+    },
+    time: {
+      description: 'What time will you depart UQ Lakes station by bus?',
+      pattern: /^(0?[1-9]|1[0-2]):[0-5][0-9]$/,
+      message: 'Please enter in ISO 8601 format (HH:mm)',
+      required: true,
+    },
+  },
+};
 
-/*
-// Year, month & day in ISO 8601 format (YYYY-MM-DD)
-const departDate = prompt('What date will you depart UQ Lakes station by bus?');
-
-// Hour & minutes in 24 hour time in ISO 8601 format (HH:mm)
-const departTime = prompt('What time will you depart UQ Lakes station by bus?');
+//
+// Get two properties from the user: name, password
+//
+prompt.get(schema, (err, result) => {
+  //
+  // Log the results.
+  //
+  console.log('Command-line input received:');
+  console.log('  date: ' + result.date);
+  console.log('  time: ' + result.time);
+});
 
 // Once date and time inputs are validated run rest of main code below
 
 // Thanks for using the UQ Lakes station bus tracker!
-const restartRequest = prompt('Would you like to search again?');
+// const restartRequest = prompt('Would you like to search again?');
 
-console.log('Thanks for using the UQ Lakes station bus tracker!');
-*/
+// console.log('Thanks for using the UQ Lakes station bus tracker!');
