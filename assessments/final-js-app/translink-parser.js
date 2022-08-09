@@ -37,6 +37,9 @@ const schema = {
   },
 };
 
+// FOR TIME MIGHT TRY BELOW. basically this one doesnt allow optional zero
+// ^([0-1][0-9]|[2][0-3]):([0-5][0-9])$
+
 //
 // Get two properties from the user: name, password
 //
