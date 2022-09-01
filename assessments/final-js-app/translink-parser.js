@@ -1,23 +1,36 @@
+// TODO
+// - zip file up (js files, cache and real-time files)
+// -exclude stop_times.txt
+// - REMOVE ALL TODOS IN THE END
+
 const fetch = require('node-fetch');
 const fs = require('fs');
+const prompt = require('prompt-sync')();
+const { parse } = require('csv-parse');
 
 /**
- * This function fetches data asynchronously based on the URL provided.
+ * This function uses node-fetch to fetch the JSON response based on the URL given.
  * @async
  * @param {string} url - the URL to fetch data from (expecting JSON).
  * @returns {string} the JSON response.
  */
 const fetchData = async (url) => {
-  const response = await fetch(url);
-  const responseJSON = await response.json();
-  return responseJSON;
+  try {
+    const response = await fetch(url);
+    const responseJSON = await response.json();
+    return responseJSON;
+  } catch (error) {
+    console.log(
+      '\u001b[1;31m ERROR: Please ensure the proxy server is running before starting the translink-parser script.'
+    );
+  }
   // console.log('RESPONSE', responseJSON);
 };
 
 /**
  * This function will save a JSON cache file with the specified filename & data.
  * @async
- * @param {string} path - The string to append to the JSON filename.
+ * @param {string} path - The location to store the stringified JSON data.
  * @param {string} data - The string containing JSON data to save.
  */
 const saveCache = async (path, data) => {
@@ -25,40 +38,46 @@ const saveCache = async (path, data) => {
     if (error) {
       console.log(error);
     } else {
-      console.log('File written successfully to: ', path);
+      // console.log('File written successfully to: ', path);
     }
   });
 };
 
 /**
- * Fetches relevant data (trip_updates, vehicle_positions, alerts) from proxy and saves to local cache
+ * This function fetches relevant data (trip_updates, vehicle_positions, alerts) from proxy and saves to local cache
  * @async
  */
 const combineFetches = async () => {
   const tripUpdates = await fetchData(
     'http://127.0.0.1:5343/gtfs/seq/trip_updates.json'
   );
-  await saveCache('./cached-data/trip_updates.json', tripUpdates);
+  const tripUpdatesToCache = tripUpdates.entity;
+  await saveCache('./cached-data/trip_updates.json', tripUpdatesToCache);
 
   const vehiclePositions = await fetchData(
     'http://127.0.0.1:5343/gtfs/seq/vehicle_positions.json'
   );
-  await saveCache('./cached-data/vehicle_positions.json', vehiclePositions);
+  const vehiclePositionsToCache = vehiclePositions.entity;
+  await saveCache(
+    './cached-data/vehicle_positions.json',
+    vehiclePositionsToCache
+  );
 
   const alerts = await fetchData('http://127.0.0.1:5343/gtfs/seq/alerts.json');
-  await saveCache('./cached-data/alerts.json', alerts);
+  const alertsToCache = alerts.entity;
+  await saveCache('./cached-data/alerts.json', alertsToCache);
 };
 
 /**
- * Starts updating local cache every 5 minutes
+ * This function starts the cache refresher which updates every 5 minutes
  */
 const startCaching = () => {
   combineFetches();
-  console.log(
-    'Initial Cache Refreshed!',
-    new Date().toLocaleDateString(),
-    new Date().toLocaleTimeString()
-  );
+  // console.log(
+  //   'Cache Refreshed!',
+  //   new Date().toLocaleDateString(),
+  //   new Date().toLocaleTimeString()
+  // );
 
   const minutes = 5;
   const secondsInMinute = 60;
@@ -69,79 +88,115 @@ const startCaching = () => {
     startCaching();
   }, cacheDelayTime);
 };
-startCaching();
+// TODO: ENABLE STARTCACHING LINE BELOW WHEN READY TO SUBMIT
+// startCaching();
 
-// ************************************************************************************ //
-// ************************************************************************************ //
-// ************************************************************************************ //
-// ************************************************************************************ //
-// ************************************************************************************ //
-// ************************************************************************************ //
-// ************************************************************************************ //
+/******************** STARTING USER PROMPT SECTION BELOW ********************/
+/******************** STARTING USER PROMPT SECTION BELOW ********************/
+/******************** STARTING USER PROMPT SECTION BELOW ********************/
+/******************** STARTING USER PROMPT SECTION BELOW ********************/
 
-// https://mattluscombe.notion.site/JavaScript-Functional-Programming-Assessment-Brief-7790ff9b78834d2da21c05495cd30a4a
+/**
+ * @type {string}
+ */
+let dateDeparting = '';
+/**
+ * @type {string}
+ */
+let timeDeparting = '';
 
-// https://www.data.qld.gov.au/dataset/general-transit-feed-specification-gtfs-seq/resource/be7f19e5-3ee8-4396-b9eb-46f6b4ce8039
-// TODO Understand what the files I have downloaded mean.
+/**
+ * Prompts the user for the departue date.
+ */
+const promptForDate = () => {
+  let counter = 0;
+  dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
 
-// const fs = require('fs');
-// const prompt = require('prompt');
-// const { parse } = require('csv-parse/sync');
+  while (true) {
+    dateDeparting = prompt(
+      'What date will you depart UQ Lakes station by bus? '
+    );
+    if (dateRegex.test(dateDeparting)) {
+      break;
+    } else {
+      if (counter === 2) {
+        console.log(
+          '\u001b[1;31m Error receiving input. Script will now exit \u001b[0m'
+        );
+        process.exit();
+      }
+      console.log(
+        '\u001b[1;31m Please enter in ISO 8601 format (YYYY-MM-DD) \u001b[0m'
+      );
+      counter++;
+    }
+  }
+};
 
-// console.log(parse('Hello,world\n1,2'));
+/**
+ * Prompts the user for the departue time.
+ */
+const promptForTime = () => {
+  let counter = 0;
+  timeRegex = /^([0-1][0-9]|[2][0-3]):([0-5][0-9])$/;
 
-// const readData = () => {
-//   fs.readFile('./cached-data/trip_updates.json', (err, data) => {
-//     if (err) throw err;
-//     let tripUpdates = JSON.parse(data);
-//   });
-// };
-// // readData();
+  while (true) {
+    timeDeparting = prompt(
+      'What time will you depart UQ Lakes station by bus? '
+    );
+    if (timeRegex.test(timeDeparting)) {
+      break;
+    } else {
+      if (counter === 2) {
+        console.log(
+          '\u001b[1;31m Error receiving input. Script will now exit \u001b[0m'
+        );
+        process.exit();
+      }
+      console.log(
+        '\u001b[1;31m Please enter in ISO 8601 format (HH:mm) \u001b[0m'
+      );
+      counter++;
+    }
+  }
+};
+
+/**
+ * Function that parses a file to an object.
+ * @param {string} readPath - The location to store the stringified data.
+ * @param {string} writePath - The string containing JSON data to save. //TODO REMOVE THIS
+ * @param {requestCallback} [cb] - The callback that handles the response. //TODO MAYBE NOT NEED THIS IDK
+ */
+const readFile = (readPath, writePath, cb) => {
+  let arr = [];
+  fs.createReadStream(readPath)
+    .pipe(parse({ delimiter: ',', from_line: 2 }))
+    .on('data', function (row) {
+      console.log('finished row');
+      arr = [...arr, row];
+      saveCache(writePath, arr);
+    })
+    .on('end', function () {
+      cb();
+      console.log('finished reading and writing', readPath);
+    })
+    .on('error', function (error) {
+      console.log(error.message);
+    });
+};
+
+// readFile('./static-data/calendar.txt', './reads/calendar.json', () => {
+//   console.log('Hi');
+// });
+// readFile('./static-data/calendar_dates.txt', './reads/calendar_dates.json');
+// readFile('./static-data/routes.txt', './reads/routes.json');
+// readFile('./static-data/calendar.txt', './reads/calendar.json');
+// readFile('./static-data/shapes.txt', './reads/shapes.json');
+// readFile('./static-data/stop_times.txt', './reads/stop_times.json');
+// readFile('./static-data/stops.txt', './reads/stops.json');
+// readFile('./static-data/trips.txt', './reads/trips.json');
 
 // // After running the server application, this will load a JSON version of SEQ Alerts (originally in Protobuf format).
-
-// prompt.start();
-
-// console.log('Welcome to the UQ Lakes station bus tracker!');
-
-// const schema = {
-//   properties: {
-//     date: {
-//       description: 'What date will you depart UQ Lakes station by bus?',
-//       pattern: /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/,
-//       message: 'Please enter in ISO 8601 format (YYYY-MM-DD)',
-//       required: true,
-//     },
-//     time: {
-//       description: 'What time will you depart UQ Lakes station by bus?',
-//       pattern: /^(0?[1-9]|1[0-2]):[0-5][0-9]$/,
-//       message: 'Please enter in ISO 8601 format (HH:mm)',
-//       required: true,
-//     },
-//   },
-// };
-
-// FOR TIME MIGHT TRY BELOW. basically this one doesnt allow optional zero
-// ^([0-1][0-9]|[2][0-3]):([0-5][0-9])$
-
-//
-// Get two properties from the user: name, password
-//
-
-/////////////////////////////////////////
-/*
-prompt.get(schema, (err, result) => {
-  //
-  // Log the results.
-  //
-  console.log('Command-line input received:');
-  console.log('  date: ' + result.date);
-  console.log('  time: ' + result.time);
-});
-*/
-////////////////////////////////////////////
-
-// Once date and time inputs are validated run rest of main code below
 
 // After the prompts are validated against the expected values, parse & output at least the following
 // for each result that is scheduled to arrive less than 10 minutes from the current time:
@@ -162,14 +217,43 @@ prompt.get(schema, (err, result) => {
 // };
 // getBuses();
 
-// fs.createReadStream('./static-data/calendar.txt')
-//   .pipe(parse())
-//   .on('data', (row) => {
-//     console.log(row);
-//     fs.writeFileSync('./cached-data/test.json', JSON.stringify(row));
-//   });
+const restartRequest = () => {
+  let restartPrompt = '';
+  let counter = 0;
+  const acceptableWords = ['yes', 'y', 'no', 'n'];
 
-// Thanks for using the UQ Lakes station bus tracker!
-// const restartRequest = prompt('Would you like to search again?');
+  while (true) {
+    restartPrompt = prompt('Would you like to search again? ');
+    if (acceptableWords.includes(restartPrompt.toLowerCase())) {
+      if (
+        restartPrompt.toLowerCase() === acceptableWords[0] ||
+        restartPrompt.toLowerCase() === acceptableWords[1]
+      ) {
+        main();
+      } else {
+        console.log('Thanks for using the UQ Lakes station bus tracker!');
+        process.exit();
+      }
+      break;
+    } else {
+      if (counter === 2) {
+        console.log(
+          '\u001b[1;31m Error receiving input. Script will now exit \u001b[0m'
+        );
+        process.exit();
+      }
+      console.log('\u001b[1;31m Invalid input. Please try again! \u001b[0m');
+      counter++;
+    }
+  }
+};
 
-// console.log('Thanks for using the UQ Lakes station bus tracker!');
+const main = () => {
+  console.log('Welcome to the UQ Lakes station bus tracker!');
+  promptForDate();
+  promptForTime();
+  console.log('USER SELECTED DATE AND TIME', dateDeparting, timeDeparting);
+  restartRequest();
+};
+
+main();
